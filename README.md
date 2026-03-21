@@ -12,3 +12,5 @@ The frontend bucket allows public access for website hosting, while the files bu
 Added Cognito user authentication for SkyStore
 
 implemented upload file logic with presigned url
+
+implement sqs and ec2 worker logic

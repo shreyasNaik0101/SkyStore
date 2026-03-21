@@ -3,6 +3,9 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
+const sqs = new SQSClient({ region: "ap-south-1" });
 
 const REGION = "ap-south-1";
 const BUCKET = "skystore-files-090208085314-ap-south-1-an";
@@ -50,6 +53,16 @@ export const handler = async (event) => {
         }
       })
     );
+
+    await sqs.send(new SendMessageCommand({
+      QueueUrl: "https://sqs.ap-south-1.amazonaws.com/090208085314/skystore-file-proccessing-queue",
+      MessageBody: JSON.stringify({
+        userId,
+        fileId,
+        fileKey: key,
+        status: "uploaded"
+      })
+    }));
 
     return {
       statusCode: 200,
